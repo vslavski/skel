@@ -1,0 +1,10 @@
+# File: bin/svn.vimdiff.wrapper
+#
+# This file is a part of skel project which is distributed under MIT License.
+# See file LICENSE for full license details.
+#
+# Copyright (c) 2020-present Nikita Zuev (V.Slavski!) <nikita.zuev@gmx.com>
+
+#!/bin/sh
+
+vim -d -R -c 'wincmd l|normal gg' "$6" "$7"

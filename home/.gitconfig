@@ -1,0 +1,52 @@
+# File: home/.gitconfig
+#
+# This file is a part of skel project which is distributed under MIT License.
+# See file LICENSE for full license details.
+#
+# Copyright (c) 2020-present Nikita Zuev (V.Slavski!) <nikita.zuev@gmx.com>
+
+# NOTE Add the following lines in your '$HOME/.gitconfig' file to include this one:
+#[include]
+#	path = "/path/to/skel.git/home/.gitconfig"
+
+# NOTE This lines should be defined by user in '$HOME/.gitconfig':
+#[user]
+#	name = User Name
+#	email = user@host
+#	signingkey = 012345...ABCDEF
+
+[core]
+	editor = vim
+[color]
+	ui = auto
+[commit]
+	gpgSign = true
+[diff]
+	tool = vimdiff
+[difftool]
+	prompt = false
+[merge]
+	tool = vimdiff
+	conflictstyle = diff3
+[mergetool]
+	prompt = false
+[rerere]
+	enabled = true
+[tag]
+	gpgSign = true
+[alias]
+	br		= branch --list -vv
+	ci		= commit -v
+	amend	= ci --amend
+	unci	= reset --soft HEAD^
+	uncins	= reset HEAD^
+	unst	= restore --staged .
+	vim		= difftool
+	logs	= log --first-parent --pretty=\"format:%C(yellow)%h%C(blue)[%ai]%Creset%s%C(auto)%d%Creset\"
+	logsg	= logs --branches --graph --date-order
+	logi	= logsg -10
+	logv	= log --branches --graph --stat --date-order
+	rbc		= rebase --continue
+	rbiaa	= rebase --interactive --autosquash --autostash
+	reflogs	= reflog --pretty=\"format:%C(yellow)%h%C(blue)[%ai]%Creset%s%C(auto)%d%Creset\"
+	st		= status -sb

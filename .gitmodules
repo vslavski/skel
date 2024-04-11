@@ -1,0 +1,9 @@
+[submodule "vim-glsl.git"]
+	path = vim-packs/vim-glsl/start/vim-glsl.git
+	url = https://github.com/tikhomirov/vim-glsl
+[submodule "vim-ingo-library.git"]
+	path = vim-packs/vim-ingo-library/start/vim-ingo-library.git
+	url = https://github.com/inkarkat/vim-ingo-library.git
+[submodule "vim-mark.git"]
+	path = vim-packs/vim-mark/start/vim-mark.git
+	url = https://github.com/inkarkat/vim-mark

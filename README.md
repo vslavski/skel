@@ -1,6 +1,6 @@
 # skel.git
 
-Skeleton (like a ```/etc/skel/``` directory). Mostly contains configuration files to make life in _Bash_, _Git_, and _Vim_ easier.
+Skeleton (like a `/etc/skel/` directory). Mostly contains configuration files to make life in _Bash_, _Git_, and _Vim_ easier.
 
 ## Configuration Files
 
@@ -12,20 +12,20 @@ Skeleton (like a ```/etc/skel/``` directory). Mostly contains configuration file
 
 #### Prompt (PS1)
 
-_Bash_ ```PS1``` variable is modified to display the following state:
+_Bash_ `PS1` variable is modified to display the following state:
 
 * _Git_ repository status, if any:
   * Current branch name (or rebase/cherry-pick commit message if currently on rebase/cherry-pick);
   * Ahead/behind of the origin branch status;
-  * Status symbol of the first file listed in ```$ git status```;
+  * Status symbol of the first file listed in `$ git status`;
   * Count of stash entries;
-  * ```git.wip.tgz``` file availability _(see below)_;
+  * `git.wip.tgz` file availability _(see below)_;
 * Availability of a saved _Vim_ session(s) in a current directory _(see below)_;
 * Shell status:
-  * Shell level (```$SHLVL```);
-  * Running jobs (```$ man jobs```);
-  * New mail (local), if any (```$ man mail```);
-  * Exit code of the last shell command, if non-zero (```$?```).
+  * Shell level (`$SHLVL`);
+  * Running jobs (`$ man jobs`);
+  * New mail (local), if any (`$ man mail`);
+  * Exit code of the last shell command, if non-zero (`$?`).
 
 ![PS1 example](ps1.example.png "Git rebase example")
 
@@ -35,41 +35,41 @@ _Bash_ ```PS1``` variable is modified to display the following state:
 
 > **TODO** Provide all the descriptions.
 
-```$ ps1.git.enable``` - Enable displaying of a _Git_ repository status (if current directory itself within a _Git_ repository) 
-  in a shell prompt (```PS1```). Enabled by default.
+`$ ps1.git.enable` - Enable displaying of a _Git_ repository status (if current directory itself within a _Git_ repository) 
+  in a shell prompt (`PS1`). Enabled by default.
 
-```$ ps1.git.disable``` - Suspend displaying of a _Git_ repository status. Could be handy for a large repositories, 
-  e.g. when ```$ git status``` evaluation tooks long time.
+`$ ps1.git.disable` - Suspend displaying of a _Git_ repository status. Could be handy for a large repositories, 
+  e.g. when `$ git status` evaluation tooks long time.
 
-```$ git.fetch.all [-r]``` - _[WIP]_
+`$ git.fetch.all [-r]` - _[WIP]_
 
-```$ git.wip.pack [-u]``` - _TODO_
+`$ git.wip.pack [-u]` - _TODO_
 
-```$ git.info``` - Short for ```$ git st && git logi```.
+`$ git.info` - Short for `$ git st && git logi`.
 
-```$ git.rmorig``` - Prompted remove of all the ```*.orig``` files within a repository.
+`$ git.rmorig` - Prompted remove of all the `*.orig` files within a repository.
 
-```$ git.commit.stats``` - _[WIP]_
+`$ git.commit.stats` - _[WIP]_
 
-```$ git.autofixup [commit]``` - _[WIP]_
+`$ git.autofixup [commit]` - _[WIP]_
 
 #### SVN Functions
 
-```$ svn.vim``` - _TODO_
+`$ svn.vim` - _TODO_
 
-```$ svn.wip.pack``` - _TODO_
+`$ svn.wip.pack` - _TODO_
 
 #### Vim Functions
 
-```$ vim.session``` - _TODO_
+`$ vim.session` - _TODO_
 
 #### Aliases
 
-```$ colgrep``` - _grep_ with forced color output and ```-RnPH``` flags.
+`$ colgrep` - _grep_ with forced color output and `-RnPH` flags.
 
 #### PATH
 
-```PATH``` environment variable will be prefixed with ```/path/to/skel.git/bin/``` directory.
+`PATH` environment variable will be prefixed with `/path/to/skel.git/bin/` directory.
 
 ### .gitconfig
 
@@ -77,9 +77,10 @@ _Bash_ ```PS1``` variable is modified to display the following state:
 * Set commit signing;
 * Aliases.
 
-> **WARNING** Please, set ```rerere``` disabled, if you are not experienced in solving of merge conflicts. That's because 
-  the ```rerere``` option may lead to autoresolve remembered resolution of a conflict, that was previously resolved incorrectly. 
-  ```$ man git-rerere``` for more info.
+> [!WARNING]
+> Please, set `rerere` disabled, if you are not experienced in solving of merge conflicts. That's because 
+  the `rerere` option may lead to autoresolve remembered resolution of a conflict, that was previously resolved incorrectly. 
+  `$ man git-rerere` for more info.
 
 > **TODO** Provide more description for aliases.
 

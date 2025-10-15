@@ -20,7 +20,7 @@
 :nmap <Tab> : tabnext <CR>
 :nmap <S-Tab> : tabprev <CR>
 :nmap <F10> : qa! <CR>
-:nmap <C-C> : terminal <CR>
+:nmap <C-C> : terminal ++close bash <CR>
 " Display number row
 :set number
 " Highlight syntax, search (use incremental search), print margin at col 90
@@ -28,13 +28,21 @@
 :set hlsearch
 :set incsearch
 :set colorcolumn=120
-" Set text width as colorcolumn (for auto wrapping)
-:let &textwidth=&colorcolumn
+" Set text width as 120% of colorcolumn, but no more than +40 columns. (Used for auto wrapping.)
+:let &textwidth=min([&colorcolumn + 40, str2nr(&colorcolumn * 1.2)])
 " Rmember last 1000 commands
 :set history=1000
 " Securely execute local .vimrc scripts
 :set secure
 :set exrc
+
 " Open git log
 :command -nargs=* GitLog vnew|setf git|execute "read!git log <args>"|set ro|set nomodified|normal gg
 :command DiffAll windo diffthis
+
+" Markdown
+:autocmd FileType markdown setlocal expandtab
+" Python
+:autocmd FileType python setlocal expandtab
+" Rust
+:autocmd FileType rust setlocal expandtab

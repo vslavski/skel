@@ -36,13 +36,16 @@
 	gpgSign = true
 [alias]
 	br		= branch --list -vv
+	brdesc	= !git config branch.$(git branch --show-current).description || true
 	ci		= commit -v
 	amend	= ci --amend
 	unci	= reset --soft HEAD^
 	uncins	= reset HEAD^
 	unst	= restore --staged .
+	fetcha	= fetch --all -v --tags
 	vim		= difftool
 	logs	= log --first-parent --pretty=\"format:%C(yellow)%h%C(blue)[%ai]%Creset%s%C(auto)%d%Creset\"
+	logm	= log -m --graph --pretty=\"format:%C(yellow)%h%C(blue)[%ai]%Creset%s%C(auto)%d%Creset\"
 	logsg	= logs --branches --graph --date-order
 	logi	= logsg -10
 	logv	= log --branches --graph --stat --date-order
@@ -50,3 +53,5 @@
 	rbiaa	= rebase --interactive --autosquash --autostash
 	reflogs	= reflog --pretty=\"format:%C(yellow)%h%C(blue)[%ai]%Creset%s%C(auto)%d%Creset\"
 	st		= status -sb
+	stnu	= status -sb --untracked-files=no
+	ignored = status -sb --ignored

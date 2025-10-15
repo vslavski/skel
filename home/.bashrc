@@ -22,14 +22,24 @@
 ##########################################################################################
 ### 2. COLOR PROMPT WITH GIT, VIM, SHELL STATUS FOR LEVEL, JOBS, NEW MAIL
 ###    AND LAST EXIT CODE
+###    '$PS1_MACHINE_ID' PREFIXED IF DEFINED
 ##########################################################################################
 
-PS1='\[\e[01;34m\]\w\[\e[m\]`
+PS1='`
+export PS1_SHELL_EXIT_CODE=$?
+ps1.machine_id
+exit $PS1_SHELL_EXIT_CODE
+`\[\e[01;34m\]\w\[\e[m\]`
 export PS1_SHELL_EXIT_CODE=$?
 ps1.git.status
 ps1.vim.session
 ps1.shell.status
+exit $PS1_SHELL_EXIT_CODE
 `\$ '
+
+function ps1.machine_id() {
+	[ -n "$PS1_MACHINE_ID" ] && echo -ne "$PS1_MACHINE_ID|"
+}
 
 function ps1.git.enable() {
 	PS1_GIT_DISABLE=false
@@ -39,6 +49,14 @@ function ps1.git.disable() {
 }
 export PS1_GIT_DISABLE=false
 
+function ps1.git.enable.status() {
+	PS1_GIT_ENABLE_STATUS=true
+}
+function ps1.git.disable.status() {
+	PS1_GIT_ENABLE_STATUS=false
+}
+export PS1_GIT_ENABLE_STATUS=true
+
 function ps1.git.status() {
 	gitDir=` realpath "$(pwd)" `
 	while [ ! -e "$gitDir/.git" ] ; do
@@ -47,56 +65,79 @@ function ps1.git.status() {
 			&& return 0
 		gitDir="$parentGitDir"
 	done
-	$PS1_GIT_DISABLE  												\
+	$PS1_GIT_DISABLE												\
 		&& echo -en "\x01\e[7;31m\x02\$ ps1.git.enable\x01\e[m\x02"	\
 		&& return 0
-	colorAlways='-c status.color=always'
-	#example='## [32mmaster[m...[31morigin/master[m'
-	gitBranch=`	git $colorAlways status -sb 2>/dev/null					\
-			|	head -n 1												\
-			|	sed -r 's/^## (\x1B\[[0-9]+m[^\x1B]+).*$/\1\x1B[m/g'	`
-	gitRebaseCommit=
-	[ -d "$gitDir/.git/rebase-merge" -o -d "$gitDir/.git/rebase-apply" ]						\
-		&& [ -f "$gitDir/.git/REBASE_HEAD" ]													\
-		&& gitBranch='\e[01;33mREBASE\e[m'														\
-		&& gitRebaseCommit=" $(git log -1 --pretty='%s' ` cat "$gitDir/.git/REBASE_HEAD" ` )"
+	unicodeArrowUp=` echo -e "\u2191" `
+	unicodeArrowDown=` echo -e "\u2193" `
+	unicodeArrowRight=` echo -e "\u2192" `
+	unicodeIdenticalTo=` echo -e "\u2261" `
+	gitBranchFull=`	git -c color.branch=never branch --no-color --verbose 2>/dev/null	\
+				|	grep '^\* '															\
+				|	sed 's/^\*\s\+//'													`
+	gitBranch=
+	gitRebaseCommit=''
+	gitNoBranchRebasing='(no branch, rebasing '
+	[ "${gitBranchFull::${#gitNoBranchRebasing}}" = "$gitNoBranchRebasing" ]	\
+		&& gitRebaseCommit="$unicodeArrowDown$(git log -1 --pretty='%s')"
+	[ -d "$gitDir/.git/rebase-merge" -o -d "$gitDir/.git/rebase-apply" ]										\
+		&& [ -f "$gitDir/.git/REBASE_HEAD" ]																	\
+		&& gitRebaseCommit="$unicodeArrowRight$(git log -1 --pretty='%s' ` cat "$gitDir/.git/REBASE_HEAD" ` )"
+	[ -n "$gitRebaseCommit" ]					\
+		&& gitBranch='\e[01;33mREBASE\e[m'
 	gitCherryCommit=
-	[ -f "$gitDir/.git/CHERRY_PICK_HEAD" ]														\
-		&& gitBranch='\e[01;33mCHERRY\e[m'														\
-		&& gitCherryCommit=" $(git log -1 --pretty='%s' ` cat "$gitDir/.git/CHERRY_PICK_HEAD" ` )"
-	#echo -e "TEST: <$gitBranch>"
-	#example='## [32mmaster[m...[31morigin/master[m [ahead [32m1[m]'
-	gitAhead=`	git $colorAlways status -sb 2>/dev/null									\
-			|	head -n 1																\
-			|	grep -P '\[(ahead|behind)\s'											\
-			|	sed -r 's/^.*(\[(ahead|behind) \x1B\[[0-9]+m\w+\x1B\[m\]).*$/\1/g'		`
-	#echo -e "TEST: <$gitAhead>"
-	#example=' [31mM[m samples.list'
-	#example='[31m??[m .vimrc'
-	#example='[31m??[m a.out'
-	gitStatus=`	git $colorAlways status -s 2>/dev/null						\
-			|	head -n 1													\
-			|	sed -r 's/^(\s?\x1B\[[0-9]+m.+\x1B\[m\s?)\s\S.*$/\1/g'		`
-	#echo -e "TEST: <$gitStatus>"
+	[ -f "$gitDir/.git/CHERRY_PICK_HEAD" ]																			\
+		&& gitBranch='\e[01;33mCHERRY\e[m'																			\
+		&& gitCherryCommit="$unicodeArrowRight$(git log -1 --pretty='%s' ` cat "$gitDir/.git/CHERRY_PICK_HEAD" ` ) "
+	gitDetachedCommit=`	echo "$gitBranchFull"			\
+					|	grep '^(HEAD detached at '		\
+					|	sed 's/^(HEAD detached at //
+						;	s/^\([^)]\+\).*$/\1/ '		`
+	[ -n "$gitDetachedCommit" ]													\
+		&& gitBranch='\e[01;31mDETACH\e[m'										\
+		&& gitDetachedCommit=" $(git log -1 --pretty='%s' $gitDetachedCommit) "
+	[ -z "$gitBranch" ]													\
+		&& gitBranch='\e[00;32m'` echo -e "$gitBranchFull"				\
+			|	sed 's/^\(\S\+\)\s*.*$/\1/'						`'\e[m'
+	gitAhead=`	echo -e "$gitBranchFull"													\
+			|	sed 's/^\S\+\s\+\w\+\s\+//'													\
+			|	grep -P '^\[(ahead|behind)'													\
+			|	sed -r 's/^\[([^]]+)\].*$/\1/
+				; s/ahead\s+([0-9]+)(|,\s+)/\x1B[01;32m'$unicodeArrowUp'\1\x1B[m/
+				; s/behind\s+([0-9]+)/\x1B[01;31m'$unicodeArrowDown'\1\x1B[m/'				`
+	gitBranchDescription=
+	git config branch.$(git branch --show-current).description 1>/dev/null 2>&1		\
+		&& gitBranchDescription='\e[47;30m'$unicodeIdenticalTo'\e[m'
+	gitStatus=
+	if $PS1_GIT_ENABLE_STATUS; then
+		gitStatus=`	git diff --name-status 2>/dev/null					\
+				|	cut -f 1											\
+				|	sort -u												\
+				|	tr -d '\n0123456789'								`
+		[ -n "$gitStatus" ] && gitStatus="\e[00;31m$gitStatus\e[m"
+		gitStatusStaged=`	git diff --name-status --staged 2>/dev/null	\
+						|	cut -f 1									\
+						|	sort -u										\
+						|	tr -d '\n0123456789'						`
+		[ -n "$gitStatusStaged" ] && gitStatus="\e[00;32m$gitStatusStaged\e[m$gitStatus"
+		[ -n "$gitStatus" ] && gitStatus="|$gitStatus"
+	fi
 	gitStash=
 	let gitStashCount=` git stash list | wc -l `
 	[ $gitStashCount -gt 0 ]															\
 		&& gitStash=` printf "%$(( $gitStashCount / 2 ))s" | tr ' ' ':' `				\
 		&& gitStash=$gitStash` printf "%$(( $gitStashCount % 2 ))s" | tr ' ' '.' `		\
 		&& gitStash='\e[01;33m'$gitStash'\e[m'
-	#echo -e "TEST: <$gitStash>"
 	gitWipPack=
 	[ -f "$gitDir/git.wip.tgz" ]		\
 		&& gitWipPack='\e[01;35m*\e[m'
-	#echo -e "TEST: <$gitWipPack>"
-	[ -n "$gitStatus" -a -z "$gitAhead" ] && gitStatus="|$gitStatus"
-	# @todo Move this description at the begining of the section 2.
+	# @todo	Move this description at the begining of the section 2.
 	# @hack	Print, and surround non-printable sequences (colors) with
 	#		values "0x01" and "0x02" as for PS1 escape sequences "\[" and "\]".
 	#		This ensures correct PS1 line length calculation, to eleminate
 	#		incorrect text rendering (positioning) while navigating or search bash history.
 	# @see	https://stackoverflow.com/a/43462720
-	echo -en "|$gitBranch$gitRebaseCommit$gitCherryCommit$gitAhead$gitStatus$gitStash$gitWipPack"	\
+	echo -en "|$gitBranchDescription$gitBranch$gitRebaseCommit$gitCherryCommit$gitDetachedCommit$gitAhead$gitStatus$gitStash$gitWipPack"	\
 		| sed -r 's/(\x1B\[[0-9;]*m)/\x01\1\x02/g'
 	return 0
 }
@@ -244,7 +285,7 @@ function git.rmorig() {
 	find . -type f -name \*.orig
 	echo -n "Remove this files? [Y/n]: "
 	read removeYes
-	[ "$removeYes" = 'Y' ] && find . -type f -name \*.orig -exec rm -v '{}' \;
+	[ "$removeYes" = 'Y' ] && find . -type f -name \*.orig -delete
 }
 
 function git.commit.stats() {
